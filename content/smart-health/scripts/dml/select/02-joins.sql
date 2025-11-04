@@ -139,19 +139,70 @@ LIMIT 5;
 --número de documento de los pacientes junto con 
 --el nombre del tipo de documento al que pertenecen.
 
-
-
 SELECT
-    T1.first_name||' '||COALESCE(T1.middle_name, '')||' '||
-    T1.first_surname||' '||COALESCE(T1.second_surname, '') AS paciente,
 
-FROM smart_health.patients T1
-INNER JOIN smart_health.patient_addresses T2
-    ON T1.patient_id = T2.patient_id
-INNER JOIN smart_health.addresses T3
-    ON T3.patient_id = T2.patient_id
-INNER JOIN smart_health.patient_phones T4
-    ON T4.patient_id = T3.patient_id
-INNER JOIN smart_health.patient_documents T5
-    ON T5.patient_id = T4.patient_id
+    A.first_name||' '||COALESCE(A.middle_name, '')||' '||
+    A.first_surname||' '||COALESCE(A.second_surname, '') AS paciente,
+    A.document_number,
+    B.type_name
+FROM smart_health.patients A 
+JOIN smart_health.document_types B 
+    ON A.document_types_id = B.document_types_id
 LIMIT 5;
+
+
+--2. Listar los nombres de los municipios y las direcciones registradas en cada uno,
+-- de manera que se muestren todos los municipios , incluso los que no tengan direcciones asociadas.
+
+-- LEFT JOIN 
+
+
+--smart_health.municipalities:municipality_code(PK) 
+--smart_health.addreses: municipality_code(FK)
+
+
+SELECT M.municipality_name ,
+A.address_line
+FROM smart_health.municipalities M
+LEFT JOIN smart_health.addresses A 
+ON M.municipality_code = A.municipality_code;
+
+
+
+--3. Consultar las citas médicas junto con el nombre y apellido del médico asignado,
+-- filtrando solo las citas con estado "Confirmed".
+
+--INNER JOIN
+
+--smart_health.appointments: doctor_id(FK)
+--smart_health.doctors: id(PK)
+
+SELECT 
+    AP.*,
+    D.first_name AS NOMBRE,
+    D.last_name AS APELLIDO
+FROM smart_health.appointments AP
+INNER JOIN smart_health.doctors D ON AP.doctor_id = D.doctor_id
+WHERE ap.status = 'Confirmed';
+
+
+
+
+--4. Mostrar los nombres y apellidos de los pacientes junto con su dirección principal,
+-- de forma que aparezcan también los pacientes sin dirección registrada.
+
+--LEFT JOIN
+
+--smart_health.patients: patient_id(PK)
+--smart_health.patient_addresses: patient_id(FK)
+--smart_health.addresses: id(PK)
+
+
+SELECT P.first_name||''||COALESCE(P.middle_name,'') AS NOMBRES,
+P.first_surname||''||COALESCE(P.second_surname,'' ) AS APELLIDOS,
+A.address_line
+
+FROM smart_health.patients P 
+LEFT JOIN smart_health.patient_addresses PA ON PA.patient_id = P.patient_id AND PA.is_primary = TRUE
+LEFT JOIN smart_health.addresses A ON A.address_id = PA.address_id
+;
