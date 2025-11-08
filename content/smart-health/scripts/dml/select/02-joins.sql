@@ -145,6 +145,7 @@ SELECT
     A.first_surname||' '||COALESCE(A.second_surname, '') AS paciente,
     A.document_number,
     B.type_name
+
 FROM smart_health.patients A 
 JOIN smart_health.document_types B 
     ON A.document_types_id = B.document_types_id
@@ -161,11 +162,12 @@ LIMIT 5;
 --smart_health.addreses: municipality_code(FK)
 
 
-SELECT M.municipality_name ,
-A.address_line
+SELECT
+    M.municipality_name ,
+    A.address_line
 FROM smart_health.municipalities M
 LEFT JOIN smart_health.addresses A 
-ON M.municipality_code = A.municipality_code;
+    ON M.municipality_code = A.municipality_code;
 
 
 
@@ -198,7 +200,9 @@ WHERE ap.status = 'Confirmed';
 --smart_health.addresses: id(PK)
 
 
-SELECT P.first_name||''||COALESCE(P.middle_name,'') AS NOMBRES,
+SELECT
+
+ P.first_name||''||COALESCE(P.middle_name,'') AS NOMBRES,
 P.first_surname||''||COALESCE(P.second_surname,'' ) AS APELLIDOS,
 A.address_line
 
@@ -206,3 +210,18 @@ FROM smart_health.patients P
 LEFT JOIN smart_health.patient_addresses PA ON PA.patient_id = P.patient_id AND PA.is_primary = TRUE
 LEFT JOIN smart_health.addresses A ON A.address_id = PA.address_id
 ;
+
+
+--5. Agrupar los pacientes por tipo de sangre y mostrar la cantidad de pacientes que tienen cada tipo.
+
+--GROUP BY
+
+--smart_health.patients: blood_type
+
+SELECT 
+    blood_type,
+    COUNT(*) AS patient_count
+FROM smart_health.patients
+WHERE blood_type IS NOT NULL
+GROUP BY blood_type
+ORDER BY patient_count DESC;
