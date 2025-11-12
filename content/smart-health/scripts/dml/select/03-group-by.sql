@@ -302,4 +302,23 @@ LIMIT 5;
 
 ----------------------------------------------------------------------------
 SELECT DISTINCT
-    
+    first_name
+FROM smart_health.patients 
+WHERE first_name LIKE 'A%'
+LIMIT 5;
+
+-----------------------------------------------------------
+
+SELECT DISTINCT
+    first_name
+FROM smart_health.patients
+WHERE first_name LIKE 'Andr__'
+LIMIT 5;
+
+------------------------------------------------------------------------------
+
+SELECT DISTINCT
+    first_name
+FROM smart_health.patients
+WHERE first_name LIKE 'S%a'
+LIMIT 5;
